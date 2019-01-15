@@ -10,18 +10,29 @@
 #include <string>
 #include <ctype.h>
 #include <unordered_map>
+#include <vector>
 
 using namespace std;
 
 string get_file();
+vector<string> load_dictionary(string file_name);
+bool search_vector(const vector<string> &vec, string to_find);
 void total_words(string file_name);
 void repeated_words(string file_name);
 void most_occurance(string file_name);
+void find_typos(vector<string>& dictionary, string file_name);
 
 int main(){
+
+    vector<string> dictionary = load_dictionary("english.txt");
+
+    bool empty_dictionary;
+
+    if(dictionary.empty()) empty_dictionary = true;
     
     string fail_code = "q";
-    string input;
+    string temp;
+    string input = "";
     
     while(input != fail_code){
         
@@ -29,27 +40,35 @@ int main(){
         cout << "   1) count total words in a file" << "\n";
         cout << "   2) count total of certain words in a file" << "\n";
         cout << "   3) find the most occuring word in a file" << "\n";
+        (empty_dictionary) ? cout << "" : cout << "   4) find potential typos in a file" << "\n";
         cout << "please enter an option: ";
+
+        input = "";
+        getline(cin, temp);
+
+        //force lower case all inputs so all options can be case insensitive 
+        for(int i = 0; i < temp.length(); i++) input += ::tolower(temp[i]);
         
-        cin >> input;
-        
-        try {
-            switch (stoi(input)){
-                case 1:
-                    total_words(get_file());
-                    break;
-                case 2:
-                    repeated_words(get_file());
-                    break;
-                case 3:
-                    most_occurance(get_file());
-                default:
-                    break;
-            }
-        } catch (...) {
-            
-            //failed so output everything again
-            
+        if(!temp.empty()){
+            try {
+                switch (stoi(input)){
+                    case 1:
+                        total_words(get_file());
+                        break;
+                    case 2:
+                        repeated_words(get_file());
+                        break;
+                    case 3:
+                        most_occurance(get_file());
+                        break;
+                    case 4:
+                        find_typos(dictionary, get_file());
+                        break;
+                    default:
+                        break;
+                }
+                cin.ignore(INT_MAX, '\n');
+            } catch (...) { /*failed so output everything again*/ }
         }
     }
     return 0;
@@ -59,7 +78,6 @@ string get_file(){
     
     string file_name = "";
     ifstream file;
-    
     file.open(file_name);
     
     while(file.fail()){
@@ -72,16 +90,58 @@ string get_file(){
     return file_name;
 }
 
+vector<string> load_dictionary(string file_name){
+
+    ifstream inputFile(file_name);
+    string temp_read;
+    string lowercase_read = "";
+
+    vector<string> dictionary;
+
+    if(!inputFile.fail()){
+        while(inputFile >> temp_read){
+
+            for(int i = 0; i < temp_read.length(); i++) lowercase_read += tolower(temp_read[i]);
+            dictionary.push_back(lowercase_read);
+            lowercase_read = "";
+
+        }
+        cout << "loaded successfully..." << "\n";
+    }
+    else cout << "no dictionary loaded, option 4 disabled" << "\n";
+    return dictionary;
+}
+
+bool search_vector(const vector<string> &vec, string to_find){
+
+    int vec_start = 0;
+    int vec_end = vec.size() - 1;
+    int counter = 0;
+
+    //check until either it found or it reached the end of search
+    while(vec_start <= vec_end){
+
+        int vec_middle = ((vec_end + vec_start)  / 2) ;
+        if(vec[vec_middle] == to_find){
+
+            return true;
+        }
+        else{
+
+            (vec[vec_middle] > to_find) ? vec_end = vec_middle - 1 : vec_start = vec_middle + 1;
+            counter ++;
+        }
+    }
+    return false;
+}
+
 void total_words(string file_name){
     
     ifstream file(file_name);
-
     string temp;
     int word_count = 0;
     
-    while(file >> temp){
-        word_count ++;
-    }
+    while(file >> temp) word_count ++;
     
     cout << "\n";
     cout << "total words found: " << word_count << "\n";
@@ -138,4 +198,19 @@ void most_occurance(string file_name){
     for (auto i = most_occurance.begin(); i != most_occurance.end(); i++) cout << i->first << " |  amount of occurances: " << i->second << "\n";
     cout << "\n";
     
+}
+
+void find_typos(vector<string>& dictionary, string file_name){
+
+    vector<string> potential;
+    ifstream file(file_name);
+    string temp;
+
+    while(file >> temp){
+        if(!(search_vector(dictionary, temp)))  potential.push_back(temp);
+    }
+
+    cout << "\n" << "potential typos or errors: " << "\n";
+    for(string str : potential) cout << str << " ";
+    cout << "\n" << "\n";
 }
