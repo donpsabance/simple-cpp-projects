@@ -24,7 +24,7 @@ void find_typos(vector<string>& dictionary, string file_name);
 
 int main(){
 
-    vector<string> dictionary = load_dictionary("english.txt");
+    vector<string> dictionary = load_dictionary("english3.txt");
 
     bool empty_dictionary;
 
@@ -54,20 +54,24 @@ int main(){
                 switch (stoi(input)){
                     case 1:
                         total_words(get_file());
+                        cin.ignore(INT_MAX, '\n');
                         break;
                     case 2:
                         repeated_words(get_file());
+                        cin.ignore(INT_MAX, '\n');
                         break;
                     case 3:
                         most_occurance(get_file());
+                        cin.ignore(INT_MAX, '\n');
                         break;
                     case 4:
                         find_typos(dictionary, get_file());
+                        cin.ignore(INT_MAX, '\n');
                         break;
                     default:
+                        cout << "invalid option" << "\n";
                         break;
                 }
-                cin.ignore(INT_MAX, '\n');
             } catch (...) { /*failed so output everything again*/ }
         }
     }
@@ -202,15 +206,54 @@ void most_occurance(string file_name){
 
 void find_typos(vector<string>& dictionary, string file_name){
 
-    vector<string> potential;
+    unordered_map<string, string> location;
     ifstream file(file_name);
+
     string temp;
+    string word;
+    string ignore = "[](),.-&123456789"; 
+
+    int count = 1;
+
+    bool pass = false;
+    bool flag = false;
+    bool add = false;
 
     while(file >> temp){
-        if(!(search_vector(dictionary, temp)))  potential.push_back(temp);
-    }
 
-    cout << "\n" << "potential typos or errors: " << "\n";
-    for(string str : potential) cout << str << " ";
-    cout << "\n" << "\n";
+        pass = false;
+        flag = false;
+        add = false;
+
+        for(int i = 0; i < temp.length(); i++){
+            for(int j = 0; j < ignore.length(); j++){
+
+                if(temp[i] == ignore[j]){
+                    flag = true;
+                } 
+            }
+
+            if(!flag){
+
+                //theres no invalid characters so we can continue
+                word += tolower(temp[i]);
+                add = true;
+
+            }
+            else{
+                break;
+            }
+        }
+
+        string format = "(" + to_string(count) + ") ";
+        if(!(search_vector(dictionary, word)) && add)  location[word] += format;
+        word = "";
+        count ++;
+
+    }
+    
+    (location.size() == 0) ? cout << "\n" << "no errors found." << "\n" : cout << "\n" << "potential typos or errors: " << "\n";
+    for (auto i = location.begin(); i != location.end(); i++) cout << i->first << " - found @ " << i->second << "\n";
+    cout << "\n";
+    
 }
