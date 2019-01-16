@@ -5,6 +5,7 @@
 //  Created by Don Abance on 2019-01-14.
 //
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -211,7 +212,7 @@ void find_typos(vector<string>& dictionary, string file_name){
 
     string temp;
     string word;
-    string ignore = "[](),.-&123456789"; 
+    string ignore = "![]().,-&1234567890{}"; 
 
     int count = 1;
 
@@ -221,35 +222,26 @@ void find_typos(vector<string>& dictionary, string file_name){
 
     while(file >> temp){
 
-        pass = false;
         flag = false;
-        add = false;
 
         for(int i = 0; i < temp.length(); i++){
             for(int j = 0; j < ignore.length(); j++){
 
-                if(temp[i] == ignore[j]){
-                    flag = true;
-                } 
-            }
+                temp.erase(std::remove(temp.begin(), temp.end(), ignore[j]), temp.end());
 
-            if(!flag){
-
-                //theres no invalid characters so we can continue
-                word += tolower(temp[i]);
-                add = true;
-
-            }
-            else{
-                break;
             }
         }
 
-        string format = "(" + to_string(count) + ") ";
-        if(!(search_vector(dictionary, word)) && add)  location[word] += format;
-        word = "";
-        count ++;
+        if(temp.length() > 0){
 
+            for(char c : temp) word += tolower(c);
+
+            string format = "(" + to_string(count) + ") ";
+            if(!(search_vector(dictionary, word)))  location[word] += format;
+            word = "";
+            count ++;
+
+        }   
     }
     
     (location.size() == 0) ? cout << "\n" << "no errors found." << "\n" : cout << "\n" << "potential typos or errors: " << "\n";
