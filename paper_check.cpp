@@ -1,5 +1,5 @@
 //
-//  wordCounter.cpp
+//  paper_check.cpp
 //  
 //
 //  Created by Don Abance on 2019-01-14.
@@ -212,17 +212,11 @@ void find_typos(vector<string>& dictionary, string file_name){
 
     string temp;
     string word;
-    string ignore = "![]().,-&1234567890{}"; 
+    string ignore = "![]().,-&1234567890{}'? " ; 
 
     int count = 1;
 
-    bool pass = false;
-    bool flag = false;
-    bool add = false;
-
     while(file >> temp){
-
-        flag = false;
 
         for(int i = 0; i < temp.length(); i++){
             for(int j = 0; j < ignore.length(); j++){
