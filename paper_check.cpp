@@ -41,7 +41,7 @@ int main(){
         cout << "options: (enter q to quit) " << "\n";
         cout << "   1) count total words & characters in a file" << "\n";
         cout << "   2) count total of certain words in a file" << "\n";
-        cout << "   3) find the (5) most occuring words in a file" << "\n";
+        cout << "   3) find the (10) most occuring words in a file" << "\n";
         (empty_dictionary) ? cout << "" : cout << "   4) find potential typos in a file" << "\n";
         cout << "please enter an option: ";
 
@@ -167,6 +167,8 @@ void repeated_words(string file_name){
     string word_to_find = "";
     string case_sensitive = "";
 
+    bool valid = false;
+
     int word_count = 0;
 
     while(word_temp.empty()){
@@ -174,35 +176,36 @@ void repeated_words(string file_name){
         getline(cin, word_temp);
     }
 
-    while(case_sensitive.empty() && (case_sensitive != "y" || case_sensitive != "Y" || case_sensitive != "n" || case_sensitive != "N")){
+    while(case_sensitive.empty() || !valid){
         cout << "case sensitive? (y/n): ";
         getline(cin, case_sensitive);
-    }
-
-    if(case_sensitive == "y" || case_sensitive == "Y"){
-        while (file >> temp) {
-            if(temp.compare(word_temp) == 0){
-                word_count ++;
-            } 
-        }
-        cout  << "\n" << "total number of \"" << word_temp << " \" found: " << word_count << "\n"  << "\n";
-    }
-    else{
         
-        for(char c : word_temp){
-            word_to_find += tolower(c);
-        }
-
-        while (file >> temp) {
-            for(char c : temp){
-                word += tolower(c);
+        if(case_sensitive == "y" || case_sensitive == "Y"){
+            while (file >> temp) {
+                if(temp.compare(word_temp) == 0){
+                    word_count ++;
+                } 
             }
-            if(word.compare(word_to_find) == 0){
-                word_count ++;
-            } 
+            cout  << "\n" << "total number of \"" << word_temp << " \" found: " << word_count << "\n"  << "\n";
+            valid = true;
         }
-
-        cout  << "\n" << "total number of \"" << word_to_find << " \" found: " << word_count << "\n"  << "\n";
+        else if(case_sensitive == "n" || case_sensitive == "N"){
+            
+            for(char c : word_temp){
+                word_to_find += tolower(c);
+            }
+            while (file >> temp) {
+                for(char c : temp){
+                    word += tolower(c);
+                }
+                if(word.compare(word_to_find) == 0){
+                    word_count ++;
+                } 
+                word = "";
+            }
+            cout  << "\n" << "total number of \"" << word_to_find << " \" found: " << word_count << "\n"  << "\n";
+            valid = true;
+        }
     }
 }
 
@@ -218,6 +221,7 @@ void most_occurance(string file_name){
     string temp;
     string word = "";
     string ignore = "![]().,-&1234567890{}'? " ; 
+    string choice = "";
     
     while (file >> temp) {
         
@@ -236,7 +240,7 @@ void most_occurance(string file_name){
     sort(amnt_occ.rbegin(), amnt_occ.rend());
 
 
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 10; i++){
         for (auto j = occurance.begin(); j != occurance.end(); j++) {
             if(amnt_occ[i] == j->second && most_occurance.find(j->first) == most_occurance.end()){
 
@@ -249,7 +253,7 @@ void most_occurance(string file_name){
     }
 
     cout << "\n" << "most occurances: " << "\n" << "ignored characters: " << ignore << "\n" << "\n";
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 10; i++){
         for (auto j = occurance.begin(); j != occurance.end(); j++) {
             if(words[i] == j->first && j->second == amnt_occ[i]){
 
@@ -268,7 +272,7 @@ void find_typos(vector<string>& dictionary, string file_name){
 
     string temp;
     string word;
-    string ignore = "![]().,-&1234567890{}'? " ; 
+    string ignore = "![]().,-&1234567890{}?:/ "; 
 
     int count = 1;
 
