@@ -20,7 +20,7 @@ void game(){
 
 	vector<char> table(9, '~');
 	string location = "0";
-	char player_turn = 'X';
+	char player_turn = 'X'; //first player to start
 
   	clear_screen();
   	draw_board(table);
@@ -30,7 +30,7 @@ void game(){
   		cin >> location;
 
   		while(!valid_input(table, location)){
-  			cout << "invalid location, please enter again: ";
+  			cout << "invalid location, please enter again: (" << player_turn << "): ";
   			cin >> location;
   		}
 
@@ -47,6 +47,7 @@ void game(){
 bool check_game(vector<char> vec){
 
 	bool result = false;
+	bool draw = true;
 
 	// //horizontal
 	if((vec[0] == vec[1] && vec[1] == vec[2]) && vec[0] != '~') { result = true;}
@@ -57,6 +58,21 @@ bool check_game(vector<char> vec){
 	else if((vec[2] == vec[5] && vec[5] == vec[8]) && vec[2] != '~') {result = true;}
 	else if((vec[0] == vec[4] && vec[4] == vec[8]) && vec[0] != '~') {result = true;}//diagon
 	else if((vec[2] == vec[4] && vec[4] == vec[6]) && vec[2] != '~') {result = true;}
+
+	//check for draw
+	for(int i = 0; i < vec.size(); i++){
+		if(vec[i] == '~'){
+			draw = false;
+			break;
+		}
+
+		if(i == vec.size() - 1){
+			if(draw){
+				cout << "game ended in a draw \n";
+				exit(0);
+			}
+		}
+	}
 
 	return result;
 }
