@@ -20,7 +20,7 @@ void run_game(){
 	std::string location = "0";
 	char player_turn = 'X'; //first player to start
 
-  	clear_screen();
+	clear_screen();
   	draw_board(table);
   	while(!check_game(table)){
   		while(!valid_input(table, location)){
@@ -28,9 +28,10 @@ void run_game(){
   			std::cin >> location;
   		}
 
-  		table[stoi(location) - 1] = player_turn;
+  		table[std::stoi(location) - 1] = player_turn;
   		clear_screen();
   		draw_board(table);
+  		// clear_screen();
 
   		std::cout << "\nprevious move: " << location << "\n";
   		if(check_game(table)){ std::cout << "player " << player_turn << " has won \n";}
@@ -95,4 +96,7 @@ void draw_board(std::vector<char> vec){
 
 }
 
-void clear_screen(){ std::cout << "\033[2J\033[1;1H"; }
+void clear_screen(){ 
+	std::cout << "\033[2J\033[1;1H"; 
+	// std::cout << std::string( 10, '\n' );
+}
