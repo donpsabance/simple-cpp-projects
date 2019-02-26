@@ -26,7 +26,8 @@ void display_game(const std::vector<std::vector<std::string> >& vec){
 		std::cout << "\n\n";
 
 	}
-	std::cout << "\n\n";
+	std::cout << "\n\033[51;93m           (1)  (2)  (3)  (4)  (5)  (6)  (7) \033[m";
+	std::cout << "\n\n\n\n\n\n";
 }
 
 bool add_slot(std::vector<std::vector<std::string> >& vec, int column, std::string color){
@@ -34,12 +35,26 @@ bool add_slot(std::vector<std::vector<std::string> >& vec, int column, std::stri
 	int count = std::stoi(vec[column][6]);
 
 	//column already full
-	if(count >= 6) return false;
+	if(count == 6) return false;
 
 	vec[column][count] = color;
 	vec[column][6] = std::to_string(count + 1);
 	return true;
 
+}
+
+bool check_tie(const std::vector<std::vector<std::string> >& vec){
+
+	for(int i = 0; i < 6; i++){
+		for(int j = 0; j < 7; j++){
+
+			if(vec[i][j] == "0") return false;
+
+		}
+	}
+
+	std::cout << "game has ended in a draw \n";
+	return true;
 }
 
 bool check_win(const std::vector<std::vector<std::string> >& vec){
@@ -75,7 +90,6 @@ bool check_win(const std::vector<std::vector<std::string> >& vec){
 
 	//diagonal 
 	for(int i = 0; i < 3; i++){
-
 		if(vec[i][i]== vec[i+1][i+1] && vec[i+1][i+1] == vec[i+2][i+2] && vec[i+2][i+2] == vec[i+3][i+3] &&
 		   vec[i][i]!= "0" && vec[i+1][i+1] != "0" && vec[i+2][i+2] != "0" && vec[i+3][i+3] != "0"){
 
@@ -99,7 +113,6 @@ bool check_win(const std::vector<std::vector<std::string> >& vec){
 	}
 
 	for(int i = 0; i < 2; i++){
-
 		if(vec[i][i+1] == vec[i+1][i+2] && vec[i+1][i+2] == vec[i+2][i+3] && vec[i+2][i+3] == vec[i+3][i+4] &&
 		   vec[i][i+1] != "0" && vec[i][i+1] != "0" && vec[i][i+1] != "0" && vec[i][i+1] != "0"){
 
@@ -134,6 +147,68 @@ bool check_win(const std::vector<std::vector<std::string> >& vec){
 		vec[0][2] != "0"){
 
 		std::cout << vec[3][0] << " has won @ 1:3 1:4 3:5 4:6 \n";
+		return true;
+	}
+
+	//reverse diagonal
+	for(int i = 9; i > 6; i--){
+		if(vec[i-3][6-(i-3)] == vec[i-4][6-(i-4)] && vec[i-4][6-(i-4)] == vec[i-5][6-(i-5)] && vec[i-5][6-(i-5)] == vec[i-6][6-(i-6)] &&
+		   vec[i-3][6-(i-3)] != "0" && vec[i-4][6-(i-4)] != "0" && vec[i-5][6-(i-5)] != "0" && vec[i-6][6-(i-6)] != "0"){
+
+			std::cout << vec[i-3][6-(i-3)] << " has won @ " << 1 + (i-3) << ":" << 1 + (6-(i-3)) << " " <<
+						   1 + (i-4) << ":" << 1 + (6-(i-4)) << " " <<
+						   1 + (i-5) << ":" << 1 + (6-(i-5)) << " " <<
+						   1 + (i-6) << ":" << 1 + (6-(i-6)) << "\n";
+
+			return true;
+		}
+
+		if(vec[i-4][6-(i-3)] == vec[i-5][6-(i-4)] && vec[i-5][6-(i-4)] == vec[i-6][6-(i-5)] && vec[i-6][6-(i-5)] == vec[i-7][6-(i-6)] &&
+		   vec[i-4][6-(i-3)] != "0" && vec[i-5][6-(i-4)] != "0" && vec[i-6][6-(i-5)] != "0" && vec[i-7][6-(i-6)] != "0"){
+
+			std::cout << vec[i-4][6-(i-3)] << " has won @ " << 1 + (i-4) << ":" << 1 + (6-(i-3)) << " " <<
+						   1 + (i-5) << ":" << 1 + (6-(i-4)) << " " <<
+						   1 + (i-6) << ":" << 1 + (6-(i-5)) << " " <<
+						   1 + (i-7) << ":" << 1 + (6-(i-6)) << "\n";
+
+			return true;
+		}
+	}
+
+	for(int i = 6; i > 4; i--){
+		if(vec[i-2][4-(i-2)] == vec[i-3][4-(i-3)] && vec[i-3][4-(i-3)] == vec[i-4][4-(i-4)] && vec[i-4][4-(i-4)] == vec[i-5][4-(i-5)] &&
+		   vec[i-2][4-(i-2)] != "0" && vec[i-3][4-(i-3)] != "0" && vec[i-4][4-(i-4)] != "0" && vec[i-5][4-(i-5)] != "0"){
+
+			std::cout << vec[i-2][4-(i-2)] << " has won @ " << 1 + (i-2) << ":" << 1 + (4-(i-2)) << " " <<
+						   1 + (i-3) << ":" << 1 + (6-(i-3)) << " " <<
+						   1 + (i-4) << ":" << 1 + (6-(i-4)) << " " <<
+						   1 + (i-5) << ":" << 1 + (6-(i-5)) << "\n";
+
+			return true;
+		}
+		if(vec[i][7-i] == vec[i-1][7-i+1] && vec[i-1][7-i+1] == vec[i-2][7-i+2] && vec[i-2][7-i+2] == vec[i-3][7-i+3] &&
+		   vec[i][7-i] != "0" && vec[i-1][7-i+1] != "0" && vec[i-2][7-i+2] != "0" && vec[i-3][7-i+3] != "0"){
+
+			std::cout << vec[i][7-i] << " has won @ " << 1 + (i) << ":" << 1 + (7-i) << " " <<
+						   1 + (i-1) << ":" << 1 + (7-i-1) << " " <<
+						   1 + (i-2) << ":" << 1 + (7-i-2) << " " <<
+						   1 + (i-3) << ":" << 1 + (7-i-3) << "\n";
+
+			return true;
+		}
+	}
+
+	if(vec[6][2] == vec[5][3] && vec[5][3] == vec[4][4] && vec[4][4] == vec[3][5] &&
+	   vec[6][2] != "0"){
+
+		std::cout << vec[6][2] << " has won @ 7:3 6:4 5:5 4:6 \n";
+		return true;
+	}
+
+	if(vec[3][0] == vec[2][1] && vec[2][1] == vec[1][2] && vec[1][2] == vec[0][3] &&
+	   vec[3][0] != "0"){
+
+		std::cout << vec[3][0] << " has won @ 4:1 3:2 2:3 1:4 \n";
 		return true;
 	}
 
@@ -172,13 +247,7 @@ void run_game(){
 
 			}
 
-			if(!add_slot(vec, std::stoi(input) - 1, "B")){
-
-					std::cout << "column already full, try again: ";
-					input = "-1";
-					
-			} 
-
+			add_slot(vec, std::stoi(input) - 1, "B");
 			display_game(vec);
 
 			input = "-1";
@@ -193,13 +262,7 @@ void run_game(){
 
 			}
 
-			if(!add_slot(vec, std::stoi(input) - 1, "R")){
-
-				std::cout << "column already full, try again: ";
-				input = "-1";
-					
-			} 
-
+			add_slot(vec, std::stoi(input) - 1, "R");
 			display_game(vec);
 
 			input = "-1";
@@ -209,7 +272,6 @@ void run_game(){
 }
 
 int main(){
-
 
 	run_game();
 
