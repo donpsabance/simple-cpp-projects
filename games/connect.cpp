@@ -43,20 +43,6 @@ bool add_slot(std::vector<std::vector<std::string> >& vec, int column, std::stri
 
 }
 
-bool check_tie(const std::vector<std::vector<std::string> >& vec){
-
-	for(int i = 0; i < 6; i++){
-		for(int j = 0; j < 7; j++){
-
-			if(vec[i][j] == "0") return false;
-
-		}
-	}
-
-	std::cout << "game has ended in a draw \n";
-	return true;
-}
-
 bool check_win(const std::vector<std::vector<std::string> >& vec){
 
 	//vertical
@@ -233,40 +219,69 @@ void run_game(){
 	std::vector<std::vector<std::string> > vec(7, std::vector<std::string> (7, "0"));
 
 	std::string input = "-1";
+
+	bool column_full = false;
+
 	int turn = 0;
+	int total_turns = 0;
 
 	display_game(vec);
 	while(!check_win(vec)){
+
+		if(total_turns == 42){
+
+			std::cout << "game ended in a draw! \n";
+			break;
+
+		}
 
 		if(turn == 0){
 
 			while(!is_valid_int(input)){
 
-				std::cout << "enter column for player B: ";
+				(column_full) ? std::cout << "column full, try again: (B): " : std::cout << "enter column for player (B): ";
+				if(column_full) column_full = false;
 				std::cin >> input;
 
 			}
 
-			add_slot(vec, std::stoi(input) - 1, "B");
-			display_game(vec);
+			if(!add_slot(vec, std::stoi(input) - 1, "B")){
+				column_full = true;
+				turn = 0;
 
+			}
+			else{
+
+				turn = 1;
+				total_turns++;
+			} 
+
+			display_game(vec);
 			input = "-1";
-			turn = 1;
 		}
 		else if(turn == 1){
 
 			while(!is_valid_int(input)){
 
-				std::cout << "enter column for player R: ";
+				(column_full) ? std::cout << "column full, try again: (R): " : std::cout << "enter column for player (R): ";
+				if(column_full) column_full = false;
 				std::cin >> input;
 
 			}
 
-			add_slot(vec, std::stoi(input) - 1, "R");
-			display_game(vec);
+			if(!add_slot(vec, std::stoi(input) - 1, "R")){
+				column_full = true;
+				turn = 1;
 
+			}
+			else{
+
+				turn = 0;
+				total_turns++;
+			} 
+
+			display_game(vec);
 			input = "-1";
-			turn = 0;
 		}
 	}
 }
